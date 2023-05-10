@@ -22,8 +22,10 @@ public class App {
         switch (Config.getExercise()) {
             case 1:
                 exercise1(outputWriter, dt); // Damped Oscillator equation
+                break;
             case 2:
                 exercise2(outputWriter, dt);
+                break;
             default:
                 System.out.println("Invalid exercise number");
         }
@@ -37,6 +39,7 @@ public class App {
         double k = Math.pow(10, 4); // N/m
         double gamma = 100; // kg/s
         double A = 1; // m
+        double tf = 5; // s
 
         // Initial Conditions
         double x = 1;
@@ -46,12 +49,12 @@ public class App {
 
         double prevX = DampedOscillator.EulerIntegral(x, v, -k*x - gamma*v, -dt, m);
 
-        for (int i = 0; i < Config.getTimeSteps(); i++) {
+        for (int i = 0; t < tf; i++) {
             double f = -k*x - gamma * v;
             double auxX = x;
 
             x = DampedOscillator.VerletIntegral(x, f, prevX, dt, m);
-            v = (x - prevX) / 2*dt;
+            v = (x - prevX) / (2*dt);
 
             if (Config.isVerbose()) System.out.printf("t=%.2f -> x=%.2f ; v=%.2f\n", t, x, v);
             if (i % Config.getOutputInterval() == 0) outputWriter.write(String.format("%.2f\n%.4f %.4f\n", t, x, v));

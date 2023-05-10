@@ -1,9 +1,9 @@
 [simulation]
 exercise = 1
-dtSimulation = 0.1 # s
+dtSimulation = 0.01 # s
 outputInterval = 2 # time steps interval
-verbose = true
-timeSteps = 50
+verbose = false
+timeSteps = 500
 
 [files]
 staticInput = "./static.txt"

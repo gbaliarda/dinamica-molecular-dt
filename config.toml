@@ -1,9 +1,14 @@
 [simulation]
-exercise = 1
-dtSimulation = 0.01 # s
-outputInterval = 2 # time steps interval
+exercise = 2
+dtSimulation = 0.001 # s
+outputInterval = 5 # time steps interval
 verbose = false
-timeSteps = 500
+tableWidth = 224
+tableHeight = 112
+whiteBallCoords = [ 56.0, 56.0,]
+whiteBallVx = 150.0
+ballMass = 165
+ballDiameter = 5.7
 
 [files]
 staticInput = "./static.txt"

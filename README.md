@@ -16,7 +16,6 @@ exercise = 1       # exercise to run
 dtSimulation = 0.1 # s
 outputInterval = 2 # time steps interval
 verbose = true     # enable simulation prints
-timeSteps = 50     # time intervals to run the simulation
 
 [files]
 staticInput = "./static.txt"

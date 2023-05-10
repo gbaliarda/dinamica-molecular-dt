@@ -28,26 +28,10 @@ public class DampedOscillator {
         return new double[]{xc, vc};
     }
 
-    public static double BeemanPosition(double x, double v, double a, double prevA, double dt) {
-        return x + v*dt + (2.0/3)*a*Math.pow(dt, 2) - (1.0/6)*prevA*Math.pow(dt, 2);
-    }
-
     public static double BeemanVelocity(double nextX, double v, double a, double prevA, double dt, double m, double gamma, double k) {
         double denominator = 1 + (dt * gamma) / (3*m);
         double numerator = v - (dt * k * nextX)/(3*m) + (5.0/6)*a*dt - (1.0/6)*prevA*dt;
         return numerator/denominator;
-    }
-
-    public static double VerletPosition(double x, double f, double prevX, double dt, double m) {
-        return 2*x - prevX + (Math.pow(dt, 2) / m) * f;
-    }
-
-    public static double EulerPosition(double x, double v, double f, double dt, double m) {
-        return x + dt*v + (Math.pow(dt, 2) / (2*m)) * f;
-    }
-
-    public static double EulerVelocity(double v, double f, double dt, double m) {
-        return v + (dt / m) * f;
     }
 
     private static int factorial(int n) {
@@ -59,13 +43,13 @@ public class DampedOscillator {
     public static void VerletEvolution(FileWriter outputWriter, double x, double v, double k, double gamma, double dt, double m) throws IOException {
         double t = 0, tf = 5;
 
-        double prevX = DampedOscillator.EulerPosition(x, v, -k*x - gamma*v, -dt, m);
+        double prevX = Integrals.EulerPosition(x, v, -k*x - gamma*v, -dt, m);
 
         for (int i = 0; t < tf; i++) {
             double f = -k*x - gamma * v;
             double auxX = x;
 
-            x = DampedOscillator.VerletPosition(x, f, prevX, dt, m);
+            x = Integrals.VerletPosition(x, f, prevX, dt, m);
             v = (x - prevX) / (2*dt);
 
             if (Config.isVerbose()) System.out.printf("t=%.2f -> x=%.2f ; v=%.2f\n", t, x, v);
@@ -79,15 +63,15 @@ public class DampedOscillator {
     public static void BeemanEvolution(FileWriter outputWriter, double x, double v, double k, double gamma, double dt, double m) throws IOException {
         double t = 0, tf = 5;
         double f = -k*x - gamma*v;
-        double prevX = DampedOscillator.EulerPosition(x, v, f, -dt, m);
-        double prevV = DampedOscillator.EulerVelocity(v, f, -dt, m);
+        double prevX = Integrals.EulerPosition(x, v, f, -dt, m);
+        double prevV = Integrals.EulerVelocity(v, f, -dt, m);
         double prevA = (-k*prevX - gamma*prevV)/m;
 
         for (int i = 0; t < tf; i++) {
             f = -k*x - gamma * v;
             double a = f/m;
 
-            x = DampedOscillator.BeemanPosition(x, v, a, prevA, dt);
+            x = Integrals.BeemanPosition(x, v, a, prevA, dt);
             v = DampedOscillator.BeemanVelocity(x, v, a, prevA, dt, m, gamma, k);
 
             if (Config.isVerbose()) System.out.printf("t=%.2f -> x=%.2f ; v=%.2f\n", t, x, v);

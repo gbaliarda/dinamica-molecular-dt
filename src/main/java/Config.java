@@ -6,8 +6,9 @@ import java.io.InputStream;
 import java.util.List;
 
 public class Config {
+    private static int tableWidth, tableHeight;
     private static double dtSimulation;
-    private static int timeSteps, outputInterval, exercise;
+    private static int outputInterval, exercise;
     private static boolean verbose;
     private static String staticFile, outputFile;
 
@@ -15,9 +16,10 @@ public class Config {
         try {
             Toml toml = new Toml().read(new File("config.toml"));
 
+            tableWidth = toml.getLong("simulation.tableWidth").intValue();
+            tableHeight = toml.getLong("simulation.tableHeight").intValue();
             dtSimulation = toml.getDouble("simulation.dtSimulation");
             outputInterval = toml.getLong("simulation.outputInterval").intValue();
-            timeSteps = toml.getLong("simulation.timeSteps").intValue();
             exercise = toml.getLong("simulation.exercise").intValue();
             verbose = toml.getBoolean("simulation.verbose");
             staticFile = toml.getString("files.staticInput");
@@ -25,6 +27,14 @@ public class Config {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static int getTableWidth() {
+        return tableWidth;
+    }
+
+    public static int getTableHeight() {
+        return tableHeight;
     }
 
     public static int getExercise() {
@@ -37,10 +47,6 @@ public class Config {
 
     public static int getOutputInterval() {
         return outputInterval;
-    }
-
-    public static int getTimeSteps() {
-        return timeSteps;
     }
 
     public static boolean isVerbose() {

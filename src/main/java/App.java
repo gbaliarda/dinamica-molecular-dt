@@ -45,7 +45,8 @@ public class App {
         double v = -A*gamma / (2*m);
 
 //        DampedOscillator.VerletEvolution(outputWriter, x, v, k, gamma, dt, m);
-        DampedOscillator.BeemanEvolution(outputWriter, x, v, k, gamma, dt, m);
+//        DampedOscillator.BeemanEvolution(outputWriter, x, v, k, gamma, dt, m);
+        DampedOscillator.GearPredictorCorrectorEvolution(outputWriter, x, v, k, gamma, dt, m);
     }
 
     private static void exercise2(FileWriter outputWriter, double dt) throws IOException {

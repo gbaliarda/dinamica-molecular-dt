@@ -1,26 +1,37 @@
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class App {
-    public static void main( String[] args ) {
+    public static void main( String[] args ) throws IOException {
         Path filePath = Paths.get(Config.getOutputFile());
+        // Create any non-existent directories in the output path
+        Files.createDirectories(filePath.getParent());
+        // Delete old output file
+        Files.deleteIfExists(filePath);
 
-        try {
-            // Create any non-existent directories in th output path
-            Files.createDirectories(filePath.getParent());
-            // Delete old output file
-            Files.deleteIfExists(filePath);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        File file = new File(Config.getOutputFile());
+        FileWriter outputWriter = new FileWriter(file, true);
 
-        // Time step
+        // Time step for the simulations
         double dt = Config.getDtSimulation();
 
-        // ------ Exercise 1 - Damped Oscillator equation ------
+        switch (Config.getExercise()) {
+            case 1:
+                exercise1(outputWriter, dt); // Damped Oscillator equation
+            case 2:
+                exercise2(outputWriter, dt);
+            default:
+                System.out.println("Invalid exercise number");
+        }
 
+        outputWriter.close();
+    }
+
+    private static void exercise1(FileWriter outputWriter, double dt) throws IOException {
         // Constants
         double m = 70; // kg
         double k = Math.pow(10, 4); // N/m
@@ -42,11 +53,16 @@ public class App {
             x = DampedOscillator.VerletIntegral(x, f, prevX, dt, m);
             v = (x - prevX) / 2*dt;
 
-            System.out.printf("t=%.2f -> x=%.2f ; v=%.2f\n", t, x, v);
+            if (Config.isVerbose()) System.out.printf("t=%.2f -> x=%.2f ; v=%.2f\n", t, x, v);
+            if (i % Config.getOutputInterval() == 0) outputWriter.write(String.format("%.2f\n%.4f %.4f\n", t, x, v));
 
             prevX = auxX;
-            t += Config.getDtSimulation();
+            t += dt;
         }
-
     }
+
+    private static void exercise2(FileWriter outputWriter, double dt) throws IOException {
+        // TODO:
+    }
+
 }

@@ -6,8 +6,8 @@ import java.io.InputStream;
 import java.util.List;
 
 public class Config {
-    private static double dtSimulation, dtOutput;
-    private static int timeSteps;
+    private static double dtSimulation;
+    private static int timeSteps, outputInterval, exercise;
     private static boolean verbose;
     private static String staticFile, outputFile;
 
@@ -15,9 +15,10 @@ public class Config {
         try {
             Toml toml = new Toml().read(new File("config.toml"));
 
-            dtSimulation = toml.getDouble("simulation.dt_simulation");
-            dtOutput = toml.getDouble("simulation.dt_output");
-            timeSteps = toml.getLong("simulation.time_steps").intValue();
+            dtSimulation = toml.getDouble("simulation.dtSimulation");
+            outputInterval = toml.getLong("simulation.outputInterval").intValue();
+            timeSteps = toml.getLong("simulation.timeSteps").intValue();
+            exercise = toml.getLong("simulation.exercise").intValue();
             verbose = toml.getBoolean("simulation.verbose");
             staticFile = toml.getString("files.staticInput");
             outputFile = toml.getString("files.output");
@@ -26,12 +27,16 @@ public class Config {
         }
     }
 
+    public static int getExercise() {
+        return exercise;
+    }
+
     public static double getDtSimulation() {
         return dtSimulation;
     }
 
-    public static double getDtOutput() {
-        return dtOutput;
+    public static int getOutputInterval() {
+        return outputInterval;
     }
 
     public static int getTimeSteps() {

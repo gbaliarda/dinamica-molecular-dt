@@ -40,16 +40,18 @@ public class DampedOscillator {
         return n * factorial(n-1);
     }
 
-    public static void VerletEvolution(FileWriter outputWriter, double x, double v, double k, double gamma, double dt, double m) throws IOException {
+    public static void VerletEvolution(FileWriter outputWriter, double x, double v, double k, double gamma, double dt, double m, double A) throws IOException {
         double t = 0, tf = 5;
 
         double prevX = Integrals.EulerPosition(x, v, -k*x - gamma*v, -dt, m);
-
-        for (int i = 0; t < tf; i++) {
+        double difference = 0;
+        int i;
+        for (i = 0; t < tf; i++) {
+            difference += Math.pow(analyticSolution(A, gamma, m, t, k) - x, 2);
             double f = -k*x - gamma * v;
             double auxX = x;
 
-            x = Integrals.VerletPosition(x, f, prevX, dt, m);
+            x = Integrals.VerletPosition(x, f, prevX, dt, m, gamma, k);
             v = (x - prevX) / (2*dt);
 
             if (Config.isVerbose()) System.out.printf("t=%.2f -> x=%.2f ; v=%.2f\n", t, x, v);
@@ -58,6 +60,13 @@ public class DampedOscillator {
             prevX = auxX;
             t += dt;
         }
+        difference += Math.pow(analyticSolution(A, gamma, m, t, k) - x, 2);
+        double error = difference/i;
+        System.out.println(error);
+    }
+
+    private static double analyticSolution(double A, double gamma, double m, double t, double k) {
+        return A*Math.exp(-t*(gamma/(2*m)))*Math.cos(Math.pow(k/m - Math.pow(gamma, 2)/(4*Math.pow(m,2)),0.5)*t);
     }
 
     public static void BeemanEvolution(FileWriter outputWriter, double x, double v, double k, double gamma, double dt, double m) throws IOException {

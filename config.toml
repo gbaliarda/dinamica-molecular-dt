@@ -1,6 +1,6 @@
 [simulation]
 exercise = 1
-dtSimulation = 0.01 # s
+dtSimulation = 0.001 # s
 outputInterval = 5 # time steps interval
 verbose = false
 tableWidth = 224

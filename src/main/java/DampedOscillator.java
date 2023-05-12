@@ -4,17 +4,17 @@ import java.util.Locale;
 
 public class DampedOscillator {
 
-    public static double[] GearPredictorCorrector(double x, double v, double a, double dt, double m, double k, double gamma) {
+    public static double[] GearPredictorCorrector(double x, double v, double a, double x3, double x4, double x5, double dt, double m, double k, double gamma) {
         // Predict r(t+dt) y v(t+dt)
         double x1 = v;
         double x2 = a;
-        double x3 = -k/m * x1;
-        double x4 = -k/m * x2;
-        double x5 = -k/m * x3;
 
         double xp = x + x1 * dt + x2 * Math.pow(dt, 2) / factorial(2) + x3 * Math.pow(dt, 3) / factorial(3) + x4 * Math.pow(dt, 4) / factorial(4) + x5 * Math.pow(dt, 5) / factorial(5);
         double x1p = x1 + x2 * dt + x3 * Math.pow(dt, 2) / factorial(2) + x4 * Math.pow(dt, 3) / factorial(3) + x5 * Math.pow(dt, 4) / factorial(4);
         double x2p = x2 + x3 * dt + x4 * Math.pow(dt, 2) / factorial(2) + x5 * Math.pow(dt, 3) / factorial(3);
+        double x3p = x3 + x4 * dt + x5 * Math.pow(dt, 2) / factorial(2);
+        double x4p = x4 + x5 * dt;
+        double x5p = x5;
 
         // Calculate a(t+dt) with f, xp(t) and vp(t)?
         double deltaA = (-k*xp - gamma*x1p) / m - x2p;
@@ -23,9 +23,13 @@ public class DampedOscillator {
         // Correct x(t+dt) and v(t+dt)
         double[] gearCoefficients = {3/16.0, 251/360.0, 1, 11/18.0, 1/6.0, 1/60.0};
         double xc = xp + gearCoefficients[0] * deltaR2;
-        double vc = x1p + gearCoefficients[1] * deltaR2 * dt;
+        double vc = x1p + gearCoefficients[1] * deltaR2 / dt;
+        double ac = x2p + gearCoefficients[2] * deltaR2 * factorial(2) / Math.pow(dt, 2);
+        double x3c = x3p + gearCoefficients[3] * deltaR2 * factorial(3) / Math.pow(dt, 3);
+        double x4c = x4p + gearCoefficients[4] * deltaR2 * factorial(4) / Math.pow(dt, 4);
+        double x5c = x5p + gearCoefficients[5] * deltaR2 * factorial(5) / Math.pow(dt, 5);
 
-        return new double[]{xc, vc};
+        return new double[]{xc, vc, ac, x3c, x4c, x5c};
     }
 
     public static double BeemanVelocity(double nextX, double v, double a, double prevA, double dt, double m, double gamma, double k) {
@@ -47,11 +51,10 @@ public class DampedOscillator {
         double difference = 0;
         int i;
         for (i = 0; t < tf; i++) {
-            difference += Math.pow(analyticSolution(A, gamma, m, t, k) - x, 2);
             double f = -k*x - gamma * v;
             double auxX = x;
 
-            x = Integrals.VerletPosition(x, f, prevX, dt, m, gamma, k);
+            x = DampedOscillator.VerletPosition(x, f, prevX, dt, m, gamma, k);
             v = (x - prevX) / (2*dt);
 
             if (Config.isVerbose()) System.out.printf("t=%.2f -> x=%.2f ; v=%.2f\n", t, x, v);
@@ -59,6 +62,7 @@ public class DampedOscillator {
 
             prevX = auxX;
             t += dt;
+            difference += Math.pow(analyticSolution(A, gamma, m, t, k) - x, 2);
         }
         difference += Math.pow(analyticSolution(A, gamma, m, t, k) - x, 2);
         double error = difference/i;
@@ -69,14 +73,23 @@ public class DampedOscillator {
         return A*Math.exp(-t*(gamma/(2*m)))*Math.cos(Math.pow(k/m - Math.pow(gamma, 2)/(4*Math.pow(m,2)),0.5)*t);
     }
 
-    public static void BeemanEvolution(FileWriter outputWriter, double x, double v, double k, double gamma, double dt, double m) throws IOException {
+    public static double VerletPosition(double x, double f, double prevX, double dt, double m, double gamma, double k) {
+        double numerator = x * (2 - (Math.pow(dt, 2) * k) / m) + prevX * (dt*gamma / (2*m) - 1);
+        double denominator = 1 + gamma*dt/(2*m);
+        return numerator/denominator;
+    }
+
+    public static void BeemanEvolution(FileWriter outputWriter, double x, double v, double k, double gamma, double dt, double m, double A) throws IOException {
         double t = 0, tf = 5;
         double f = -k*x - gamma*v;
         double prevX = Integrals.EulerPosition(x, v, f, -dt, m);
         double prevV = Integrals.EulerVelocity(v, f, -dt, m);
         double prevA = (-k*prevX - gamma*prevV)/m;
+        double difference = 0;
+        int i;
 
-        for (int i = 0; t < tf; i++) {
+        for (i = 0; t < tf; i++) {
+
             f = -k*x - gamma * v;
             double a = f/m;
 
@@ -88,23 +101,39 @@ public class DampedOscillator {
 
             prevA = a;
             t += dt;
+            difference += Math.pow(analyticSolution(A, gamma, m, t, k) - x, 2);
         }
+        double error = difference/i;
+        System.out.println(error);
     }
 
-    public static void GearPredictorCorrectorEvolution(FileWriter outputWriter, double x, double v, double k, double gamma, double dt, double m) throws IOException {
+    public static void GearPredictorCorrectorEvolution(FileWriter outputWriter, double x, double v, double k, double gamma, double dt, double m, double A) throws IOException {
         double t = 0, tf = 5;
+        double difference = 0;
+        int i;
 
-        for (int i = 0; t < tf; i++) {
-            double a = (-k*x-v*gamma)/m;
+        double a = (-k*x-gamma*v)/m;
+        double x3 = (-k*v - gamma*a)/m;
+        double x4 = (-k*a - gamma*x3)/m;
+        double x5 = (-k*x3 - gamma*x4)/m;
 
-            double[] res = GearPredictorCorrector(x, v, a, dt, m, k, gamma);
+        for (i = 0; t < tf; i++) {
+
+            double[] res = GearPredictorCorrector(x, v, a, x3, x4, x5, dt, m, k, gamma);
             x = res[0];
             v = res[1];
+            a = res[2];
+            x3 = res[3];
+            x4 = res[4];
+            x5 = res[5];
 
             if (Config.isVerbose()) System.out.printf("t=%.2f -> x=%.2f ; v=%.2f\n", t, x, v);
             if (i % Config.getOutputInterval() == 0) outputWriter.write(String.format(Locale.US, "%.2f\n%.4f %.4f\n", t, x, v));
 
             t += dt;
+            difference += Math.pow(analyticSolution(A, gamma, m, t, k) - x, 2);
         }
+        double error = difference/i;
+        System.out.println(error);
     }
 }

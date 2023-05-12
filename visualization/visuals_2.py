@@ -50,7 +50,7 @@ def main() -> None:
         ax.set_aspect('auto')
         ax.set_xlim([0, 224])
         ax.set_ylim([0, 112])
-        ax.set_title(f'Time: {t}')
+        ax.set_title(f'Time: {t:.2f}')
 
     # Create figure and axes
     fig, ax = plt.subplots(figsize=(10, 5))

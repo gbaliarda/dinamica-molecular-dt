@@ -1,14 +1,15 @@
 [simulation]
-exercise = 1
+exercise = 2
 dtSimulation = 0.001 # s
-outputInterval = 5 # time steps interval
+outputInterval = 10 # time steps interval
 verbose = false
 tableWidth = 224
 tableHeight = 112
 whiteBallCoords = [ 56.0, 56.0,]
-whiteBallVx = 150.0
+whiteBallVx = 100.0
 ballMass = 165
 ballDiameter = 5.7
+integration = "euler"
 
 [files]
 staticInput = "./static.txt"

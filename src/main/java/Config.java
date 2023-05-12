@@ -10,7 +10,7 @@ public class Config {
     private static double dtSimulation;
     private static int outputInterval, exercise;
     private static boolean verbose;
-    private static String staticFile, outputFile;
+    private static String staticFile, outputFile, integration;
 
     static {
         try {
@@ -22,6 +22,7 @@ public class Config {
             outputInterval = toml.getLong("simulation.outputInterval").intValue();
             exercise = toml.getLong("simulation.exercise").intValue();
             verbose = toml.getBoolean("simulation.verbose");
+            integration = toml.getString("simulation.integration");
             staticFile = toml.getString("files.staticInput");
             outputFile = toml.getString("files.output");
         } catch (Exception e) {
@@ -57,5 +58,9 @@ public class Config {
 
     public static String getOutputFile() {
         return outputFile;
+    }
+
+    public static String getIntegration() {
+        return integration;
     }
 }

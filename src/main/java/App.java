@@ -101,6 +101,8 @@ public class App {
             double mass = doubles[6];
             double radius = doubles[7];
             Particle p = new Particle(x, y, vx, vy, fx, fy, mass, radius, color);
+            p.setPrevX(Integrals.EulerPosition(x, vx, fx, -Config.getDtSimulation(), mass));
+            p.setPrevY(Integrals.EulerPosition(y, vy, fy, -Config.getDtSimulation(), mass));
             particles.add(p);
         });
 

@@ -2,6 +2,7 @@ import java.util.Objects;
 
 public class Particle {
     private double x, y, vx, vy, fx, fy, mass, radius;
+    private double prevX = 0, prevY = 0;
     private final String color;
 
     public Particle(double x, double y, double vx, double vy, double fx, double fy, double mass, double radius, String color) {
@@ -32,6 +33,14 @@ public class Particle {
 
     public double getX() {
         return x;
+    }
+
+    public double getPrevX() {
+        return prevX;
+    }
+
+    public double getPrevY() {
+        return prevY;
     }
 
     public double getY() {
@@ -80,6 +89,14 @@ public class Particle {
 
     public void setX(double x) {
         this.x = x;
+    }
+
+    public void setPrevX(double prevX) {
+        this.prevX = prevX;
+    }
+
+    public void setPrevY(double prevY) {
+        this.prevY = prevY;
     }
 
     public void setY(double y) {

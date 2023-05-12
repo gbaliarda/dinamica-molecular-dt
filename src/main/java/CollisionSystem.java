@@ -17,10 +17,10 @@ public class CollisionSystem {
         for (Particle p : particles) {
             if (p.isFixed()) continue;
 
-            double newX = Integrals.EulerPosition(p.getX(), p.getVx(), p.getFx(), dt, p.getMass());
-            double newY = Integrals.EulerPosition(p.getY(), p.getVy(), p.getFy(), dt, p.getMass());
-            double newVx = Integrals.EulerVelocity(p.getVx(), p.getFx(), dt, p.getMass());
-            double newVy = Integrals.EulerVelocity(p.getVy(), p.getFy(), dt, p.getMass());
+            double newX = nextPosition(p.getX(), p.getVx(), p.getFx(), p.getMass(), p.getPrevX());
+            double newY = nextPosition(p.getY(), p.getVy(), p.getFy(), p.getMass(), p.getPrevY());
+            double newVx = nextVelocity(newX, p.getPrevX(), p.getVx(), p.getFx(), p.getMass());
+            double newVy = nextVelocity(newY, p.getPrevY(), p.getVy(), p.getFy(), p.getMass());
             p.setX(newX);
             p.setY(newY);
             p.setVx(newVx);
@@ -39,22 +39,46 @@ public class CollisionSystem {
         // Remove particles that entered a hole
         particles = particles.stream().filter(particle -> !toRemove.contains(particle)).collect(Collectors.toList());
 
-        // Check collision with horizontal and vertical walls
-        for (Particle p : particles) {
-            // TODO: check if this is correct
-            if (p.getX() - p.getRadius() <= 0 || p.getX() + p.getRadius() >= Config.getTableWidth())
-                p.bounceX();
-            if (p.getY() - p.getRadius() <= 0 || p.getY() + p.getRadius() >= Config.getTableHeight())
-                p.bounceY();
-        }
+//        // Check collision with horizontal and vertical walls
+//        for (Particle p : particles) {
+//            if (p.getX() - p.getRadius() <= 0 || p.getX() + p.getRadius() >= Config.getTableWidth())
+//                p.bounceX();
+//            if (p.getY() - p.getRadius() <= 0 || p.getY() + p.getRadius() >= Config.getTableHeight())
+//                p.bounceY();
+//        }
 
         // Update simulation time
         t += dt;
     }
 
+    private double nextPosition(double r, double v, double f, double mass, double prevR) {
+        switch (Config.getIntegration()) {
+            case "euler":
+                return Integrals.EulerPosition(r, v, f, dt, mass);
+            case "verlet":
+                return Integrals.VerletPosition(r, prevR, dt, mass, f);
+            case "gear":
+                return 0;
+            default:
+                throw new RuntimeException("Invalid integration method");
+        }
+    }
+
+    private double nextVelocity(double newR, double prevR, double v, double f, double mass) {
+        switch (Config.getIntegration()) {
+            case "euler":
+                return Integrals.EulerVelocity(v, f, dt, mass);
+            case "verlet":
+                return Integrals.VerletVelocity(newR, prevR, dt);
+            default:
+                throw new RuntimeException("Invalid integration method");
+        }
+    }
+
     private double[] getForceDelta(Particle p, Set<Particle> toRemove) {
         double[] df = {0, 0};
-        double K = Math.pow(10, 4); // N/m
+        double K = Math.pow(10, 7); // g/s^2
+        double gamma = 100000; // g/s
 
         for (Particle other : particles) {
             if (other.equals(p))
@@ -81,6 +105,13 @@ public class CollisionSystem {
                     df[1] = 0;
             }
         }
+
+        // Check elastic forces with horizontal and vertical walls
+        if (p.getX() - p.getRadius() <= 0 || p.getX() + p.getRadius() >= Config.getTableWidth())
+            df[0] += -K*p.getX()-gamma*p.getVx();
+
+        if (p.getY() - p.getRadius() <= 0 || p.getY() + p.getRadius() >= Config.getTableHeight())
+            df[1] += -K*p.getY()-gamma*p.getVy();
 
         return df;
     }

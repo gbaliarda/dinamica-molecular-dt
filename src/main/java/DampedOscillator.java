@@ -51,6 +51,7 @@ public class DampedOscillator {
         double difference = 0;
         int i;
         for (i = 0; t < tf; i++) {
+            difference += Math.pow(analyticSolution(A, gamma, m, t, k) - x, 2);
             double f = -k*x - gamma * v;
             double auxX = x;
 
@@ -62,7 +63,6 @@ public class DampedOscillator {
 
             prevX = auxX;
             t += dt;
-            difference += Math.pow(analyticSolution(A, gamma, m, t, k) - x, 2);
         }
         difference += Math.pow(analyticSolution(A, gamma, m, t, k) - x, 2);
         double error = difference/i;
@@ -89,7 +89,7 @@ public class DampedOscillator {
         int i;
 
         for (i = 0; t < tf; i++) {
-
+            difference += Math.pow(analyticSolution(A, gamma, m, t, k) - x, 2);
             f = -k*x - gamma * v;
             double a = f/m;
 
@@ -101,8 +101,8 @@ public class DampedOscillator {
 
             prevA = a;
             t += dt;
-            difference += Math.pow(analyticSolution(A, gamma, m, t, k) - x, 2);
         }
+        difference += Math.pow(analyticSolution(A, gamma, m, t, k) - x, 2);
         double error = difference/i;
         System.out.println(error);
     }
@@ -118,6 +118,7 @@ public class DampedOscillator {
         double x5 = (-k*x3 - gamma*x4)/m;
 
         for (i = 0; t < tf; i++) {
+            difference += Math.pow(analyticSolution(A, gamma, m, t, k) - x, 2);
 
             double[] res = GearPredictorCorrector(x, v, a, x3, x4, x5, dt, m, k, gamma);
             x = res[0];
@@ -131,8 +132,8 @@ public class DampedOscillator {
             if (i % Config.getOutputInterval() == 0) outputWriter.write(String.format(Locale.US, "%.2f\n%.4f %.4f\n", t, x, v));
 
             t += dt;
-            difference += Math.pow(analyticSolution(A, gamma, m, t, k) - x, 2);
         }
+        difference += Math.pow(analyticSolution(A, gamma, m, t, k) - x, 2);
         double error = difference/i;
         System.out.println(error);
     }

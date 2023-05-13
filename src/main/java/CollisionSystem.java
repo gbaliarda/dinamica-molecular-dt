@@ -4,8 +4,8 @@ import java.util.stream.Collectors;
 public class CollisionSystem {
     private List<Particle> particles;
     private final int TABLE_HOLES = 6;
-    private double t; // in seconds
-    private double dt; // s
+    private double t;        // s
+    private final double dt; // s
 
     public CollisionSystem(List<Particle> particles, double dt) {
         this.particles = particles;
@@ -31,21 +31,13 @@ public class CollisionSystem {
 
         // Update forces on each particle
         for (Particle p : particles) {
-            double[] df = getForceDelta(p, toRemove);
-            p.setFx(df[0]);
-            p.setFy(df[1]);
+            double[] force = getCollisionForce(p, toRemove);
+            p.setFx(force[0]);
+            p.setFy(force[1]);
         }
 
         // Remove particles that entered a hole
         particles = particles.stream().filter(particle -> !toRemove.contains(particle)).collect(Collectors.toList());
-
-//        // Check collision with horizontal and vertical walls
-//        for (Particle p : particles) {
-//            if (p.getX() - p.getRadius() <= 0 || p.getX() + p.getRadius() >= Config.getTableWidth())
-//                p.bounceX();
-//            if (p.getY() - p.getRadius() <= 0 || p.getY() + p.getRadius() >= Config.getTableHeight())
-//                p.bounceY();
-//        }
 
         // Update simulation time
         t += dt;
@@ -75,14 +67,13 @@ public class CollisionSystem {
         }
     }
 
-    private double[] getForceDelta(Particle p, Set<Particle> toRemove) {
-        double[] df = {0, 0};
+    private double[] getCollisionForce(Particle p, Set<Particle> toRemove) {
+        double[] force = {0, 0};    // {fx, fy}
         double K = Math.pow(10, 7); // g/s^2
-        double gamma = 100000; // g/s
 
+        // Check collision with other particles
         for (Particle other : particles) {
-            if (other.equals(p))
-                continue;
+            if (other.equals(p)) continue;
 
             double xDistance = Math.abs(other.getX() - p.getX());
             double yDistance = Math.abs(other.getY() - p.getY());
@@ -93,27 +84,37 @@ public class CollisionSystem {
                     toRemove.add(p);
                     break;
                 }
-                // TODO: check if this is correct
+
                 if (xDistance != 0)
-                    df[0] += K * (xDistance - radiusSum) * ((other.getX() - p.getX()) / xDistance);
+                    force[0] += K * (xDistance - radiusSum) * ((other.getX() - p.getX()) / xDistance);
                 else
-                    df[0] = 0;
+                    force[0] = 0;
 
                 if (yDistance != 0)
-                    df[1] += K * (yDistance - radiusSum) * ((other.getY() - p.getY()) / yDistance);
+                    force[1] += K * (yDistance - radiusSum) * ((other.getY() - p.getY()) / yDistance);
                 else
-                    df[1] = 0;
+                    force[1] = 0;
             }
         }
 
-        // Check elastic forces with horizontal and vertical walls
-        if (p.getX() - p.getRadius() <= 0 || p.getX() + p.getRadius() >= Config.getTableWidth())
-            df[0] += -K*p.getX()-gamma*p.getVx();
+        boolean collidesLeftWall = p.getX() - p.getRadius() <= 0;
+        boolean collidesBottomWall = p.getY() - p.getRadius() <= 0;
 
-        if (p.getY() - p.getRadius() <= 0 || p.getY() + p.getRadius() >= Config.getTableHeight())
-            df[1] += -K*p.getY()-gamma*p.getVy();
+        // Check collision with vertical walls
+        if (collidesLeftWall || p.getX() + p.getRadius() >= Config.getTableWidth()) {
+            double radiusInsideWall = collidesLeftWall ? p.getRadius() - p.getX() : p.getRadius() - (Config.getTableWidth() - p.getX());
+            force[0] += K * radiusInsideWall;
+            force[0] *= collidesLeftWall ? 1 : -1;
+        }
 
-        return df;
+        // Check collision with horizontal walls
+        if (collidesBottomWall || p.getY() + p.getRadius() >= Config.getTableHeight()) {
+            double radiusInsideWall = collidesBottomWall ? p.getRadius() - p.getY() : p.getRadius() - (Config.getTableHeight() - p.getY());
+            force[1] += K * radiusInsideWall;
+            force[1] *= collidesBottomWall ? 1 : -1;
+        }
+
+        return force;
     }
 
     public boolean hasNextEvent() {

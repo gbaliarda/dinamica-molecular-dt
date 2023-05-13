@@ -62,7 +62,7 @@ def main() -> None:
     Writer = animation.writers['ffmpeg']
     writer = Writer(fps=20, bitrate=1800)
 
-    anim.save('animation.gif', writer=writer)
+    anim.save('animation.mp4', writer=writer)
 
 
 def load_config() -> dict[str, any]:

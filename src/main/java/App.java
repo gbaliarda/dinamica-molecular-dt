@@ -58,7 +58,7 @@ public class App {
 
         CollisionSystem collisionSystem = new CollisionSystem(particles, Config.getDtSimulation());
 
-        double tf = 3; // s
+        double tf = 50; // s
         int timeSteps = 0;
 
         // Run the simulation

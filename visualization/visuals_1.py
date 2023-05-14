@@ -6,6 +6,8 @@ def main() -> None:
         config = tomllib.load(f)
 
     positions = parse_output(config["files"]["output"])
+
+    # TODO: get `t` and `x` for each method
     t = list(positions.keys())
     x = list(positions.values())
 
@@ -17,13 +19,16 @@ def main() -> None:
     plt.show()
 
 
-def parse_output(outputPath: str) -> dict[float, float]:
+def parse_output(outputPath: str) -> dict[str, dict[float, float]]:
     """
-    Parse the output file and return a dictionary with
-    the time as key and the positions as values.
+    Parse the output file and return a dictionary with the
+    times and the positions for each integration method.
     """
     with open(outputPath, 'r') as file:
         lines = file.readlines()
+
+    methods = ["verlet", "beeman", "gear"]
+    method_idx = -1
 
     positions = {}
     time = None
@@ -33,9 +38,13 @@ def parse_output(outputPath: str) -> dict[float, float]:
 
         if len(data) == 1:
             time = float(data[0])
+
+            if time == 0:
+                method_idx += 1
+                positions[methods[method_idx]] = {}
         else:
             # velocity = float(data[1])
-            positions[time] = float(data[0])
+            positions[methods[method_idx]][time] = float(data[0])
     
     return positions
 

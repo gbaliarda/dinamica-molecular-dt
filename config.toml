@@ -1,11 +1,11 @@
 [simulation]
 exercise = 2
-dtSimulation = 0.000001 # s
-outputInterval = 10000 # time steps interval
+dtSimulation = 0.001
+outputInterval = 10
 verbose = false
 tableWidth = 224
 tableHeight = 112
-whiteBallCoords = [ 56.0, 56.0,]
+whiteBallCoords = [ 56.0, 42.05,]
 whiteBallVx = 100.0
 ballMass = 165
 ballDiameter = 5.7
@@ -14,3 +14,8 @@ integration = "gear"
 [files]
 staticInput = "./static.txt"
 output = "./out/output.txt"
+
+[benchmarks]
+whiteBallYRange = [ 42.0, 56.0,]
+initialPositions = 20
+rounds = 5

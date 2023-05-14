@@ -105,15 +105,17 @@ public class CollisionSystem {
         // Check collision with vertical walls
         if (collidesLeftWall || p.getX() + p.getRadius() >= Config.getTableWidth()) {
             double radiusInsideWall = collidesLeftWall ? p.getRadius() - p.getX() : p.getRadius() - (Config.getTableWidth() - p.getX());
-            force[0] += K * radiusInsideWall;
-            force[0] *= collidesLeftWall ? 1 : -1;
+            double df = K * radiusInsideWall;
+            df *= collidesLeftWall ? 1 : -1;
+            force[0] += df;
         }
 
         // Check collision with horizontal walls
         if (collidesBottomWall || p.getY() + p.getRadius() >= Config.getTableHeight()) {
             double radiusInsideWall = collidesBottomWall ? p.getRadius() - p.getY() : p.getRadius() - (Config.getTableHeight() - p.getY());
-            force[1] += K * radiusInsideWall;
-            force[1] *= collidesBottomWall ? 1 : -1;
+            double df = K * radiusInsideWall;
+            df *= collidesBottomWall ? 1 : -1;
+            force[1] += df;
         }
 
         return force;

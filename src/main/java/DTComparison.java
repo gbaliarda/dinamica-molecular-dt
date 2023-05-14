@@ -9,17 +9,17 @@ import java.util.Locale;
 
 public class DTComparison {
     public static void main(String[] args) throws IOException {
-        Path kDifferencePath = Paths.get("./out/k_difference.txt");
+        Path kDifferencePath = Paths.get("./out/k_difference5.txt");
         // Create any non-existent directories in the output path
         Files.createDirectories(kDifferencePath.getParent());
         // Delete old output file
         Files.deleteIfExists(kDifferencePath);
 
-        File kDifference = new File("./out/k_difference.txt");
+        File kDifference = new File("./out/k_difference5.txt");
         FileWriter outputWriter = new FileWriter(kDifference, true);
 
         List<Particle> particles = App.parseParticles();
-        double dt = Math.pow(10,-4);
+        double dt = Math.pow(10,-5);
         CollisionSystem collisionSystem1 = new CollisionSystem(particles, dt);
         CollisionSystem collisionSystem2 = new CollisionSystem(particles, dt/10);
         double now = System.currentTimeMillis();

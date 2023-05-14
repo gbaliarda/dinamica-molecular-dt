@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Locale;
@@ -45,6 +46,9 @@ public class DampedOscillator {
     }
 
     public static void VerletEvolution(FileWriter outputWriter, double x, double v, double k, double gamma, double dt, double m, double A) throws IOException {
+        File timeF = new File("./out/time_verlet.txt");
+        FileWriter timeOW = new FileWriter(timeF, true);
+        long start = System.nanoTime();
         double t = 0, tf = 5;
 
         double prevX = Integrals.EulerPosition(x, v, -k*x - gamma*v, -dt, m);
@@ -64,6 +68,10 @@ public class DampedOscillator {
             prevX = auxX;
             t += dt;
         }
+        double duration = (System.nanoTime()-start)/Math.pow(10,9);
+        System.out.printf(Locale.US, "Verlet Took %g seconds\n%n", duration);
+        timeOW.write(String.format(Locale.US, "%g\n", duration));
+        timeOW.close();
         difference += Math.pow(analyticSolution(A, gamma, m, t, k) - x, 2);
         double error = difference/i;
         System.out.println(error);
@@ -80,6 +88,9 @@ public class DampedOscillator {
     }
 
     public static void BeemanEvolution(FileWriter outputWriter, double x, double v, double k, double gamma, double dt, double m, double A) throws IOException {
+        File timeF = new File("./out/time_beeman.txt");
+        FileWriter timeOW = new FileWriter(timeF, true);
+        long start = System.nanoTime();
         double t = 0, tf = 5;
         double f = -k*x - gamma*v;
         double prevX = Integrals.EulerPosition(x, v, f, -dt, m);
@@ -102,12 +113,19 @@ public class DampedOscillator {
             prevA = a;
             t += dt;
         }
+        double duration = (System.nanoTime()-start)/Math.pow(10,9);
+        System.out.printf(Locale.US, "Beeman Took %g seconds\n%n", duration);
+        timeOW.write(String.format(Locale.US, "%g\n", duration));
+        timeOW.close();
         difference += Math.pow(analyticSolution(A, gamma, m, t, k) - x, 2);
         double error = difference/i;
         System.out.println(error);
     }
 
     public static void GearPredictorCorrectorEvolution(FileWriter outputWriter, double x, double v, double k, double gamma, double dt, double m, double A) throws IOException {
+        File timeF = new File("./out/time_gear.txt");
+        FileWriter timeOW = new FileWriter(timeF, true);
+        long start = System.nanoTime();
         double t = 0, tf = 5;
         double difference = 0;
         int i;
@@ -133,6 +151,10 @@ public class DampedOscillator {
 
             t += dt;
         }
+        double duration = (System.nanoTime()-start)/Math.pow(10,9);
+        System.out.printf(Locale.US, "Gear Took %g seconds\n%n", duration);
+        timeOW.write(String.format(Locale.US, "%g\n", duration));
+        timeOW.close();
         difference += Math.pow(analyticSolution(A, gamma, m, t, k) - x, 2);
         double error = difference/i;
         System.out.println(error);

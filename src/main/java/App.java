@@ -76,7 +76,7 @@ public class App {
 
     }
 
-    private static List<Particle> parseParticles() throws IOException {
+    static List<Particle> parseParticles() throws IOException {
         List<Particle> particles = new ArrayList<>();
 
         Stream<String> stream = Files.lines(Paths.get(Config.getStaticFile()));

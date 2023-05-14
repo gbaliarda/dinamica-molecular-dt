@@ -11,6 +11,7 @@ with open("config.toml", "rb") as f:
   WHITEBALL_COORDS = config["simulation"]["whiteBallCoords"]
   TABLE_WIDTH = config["simulation"]["tableWidth"]
   TABLE_HEIGHT = config["simulation"]["tableHeight"]
+  GENERATE_FIXED = config["simulation"]["generateFixed"]
 
 # X, Y, vx, vy, mass, radius
 def generate_static_file():
@@ -19,12 +20,13 @@ def generate_static_file():
         f.write(f"{WHITEBALL_COORDS[0]} {WHITEBALL_COORDS[1]} {WHITEBALL_VX} 0 0 0 {BALL_MASS} {BALL_DIAMETER/2} white\n")
 
         # Fixed balls (table holes)
-        f.write(f"0 0 0 0 0 0 0 {BALL_DIAMETER} gray\n")
-        f.write(f"{TABLE_WIDTH / 2} 0 0 0 0 0 0 {BALL_DIAMETER} gray\n")
-        f.write(f"{TABLE_WIDTH} 0 0 0 0 0 0 {BALL_DIAMETER} gray\n")
-        f.write(f"0 {TABLE_HEIGHT} 0 0 0 0 0 {BALL_DIAMETER} gray\n")
-        f.write(f"{TABLE_WIDTH / 2} {TABLE_HEIGHT} 0 0 0 0 0 {BALL_DIAMETER} gray\n")
-        f.write(f"{TABLE_WIDTH} {TABLE_HEIGHT} 0 0 0 0 0 {BALL_DIAMETER} gray\n")
+        if GENERATE_FIXED:
+            f.write(f"0 0 0 0 0 0 0 {BALL_DIAMETER} gray\n")
+            f.write(f"{TABLE_WIDTH / 2} 0 0 0 0 0 0 {BALL_DIAMETER} gray\n")
+            f.write(f"{TABLE_WIDTH} 0 0 0 0 0 0 {BALL_DIAMETER} gray\n")
+            f.write(f"0 {TABLE_HEIGHT} 0 0 0 0 0 {BALL_DIAMETER} gray\n")
+            f.write(f"{TABLE_WIDTH / 2} {TABLE_HEIGHT} 0 0 0 0 0 {BALL_DIAMETER} gray\n")
+            f.write(f"{TABLE_WIDTH} {TABLE_HEIGHT} 0 0 0 0 0 {BALL_DIAMETER} gray\n")
         
         # Triangle balls
         colors = ['yellow', 'blue', 'red', 'purple', 'orange', 'green',

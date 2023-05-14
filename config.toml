@@ -10,6 +10,7 @@ whiteBallVx = 100.0
 ballMass = 165
 ballDiameter = 5.7
 integration = "gear"
+generateFixed = false
 
 [files]
 staticInput = "./static.txt"

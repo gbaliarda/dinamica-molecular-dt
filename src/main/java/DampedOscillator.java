@@ -59,7 +59,7 @@ public class DampedOscillator {
             v = (x - prevX) / (2*dt);
 
             if (Config.isVerbose()) System.out.printf("t=%.2f -> x=%.2f ; v=%.2f\n", t, x, v);
-            if (i % Config.getOutputInterval() == 0) outputWriter.write(String.format(Locale.US, "%.2f\n%.4f %.4f\n", t, x, v));
+            if (i % Config.getOutputInterval() == 0) outputWriter.write(String.format(Locale.US, "%.8f\n%.8f %.8f\n", t, x, v));
 
             prevX = auxX;
             t += dt;
@@ -97,7 +97,7 @@ public class DampedOscillator {
             v = DampedOscillator.BeemanVelocity(x, v, a, prevA, dt, m, gamma, k);
 
             if (Config.isVerbose()) System.out.printf("t=%.2f -> x=%.2f ; v=%.2f\n", t, x, v);
-            if (i % Config.getOutputInterval() == 0) outputWriter.write(String.format(Locale.US, "%.2f\n%.4f %.4f\n", t, x, v));
+            if (i % Config.getOutputInterval() == 0) outputWriter.write(String.format(Locale.US, "%.8f\n%.8f %.8f\n", t, x, v));
 
             prevA = a;
             t += dt;
@@ -129,7 +129,7 @@ public class DampedOscillator {
             x5 = res[5];
 
             if (Config.isVerbose()) System.out.printf("t=%.2f -> x=%.2f ; v=%.2f\n", t, x, v);
-            if (i % Config.getOutputInterval() == 0) outputWriter.write(String.format(Locale.US, "%.2f\n%.4f %.4f\n", t, x, v));
+            if (i % Config.getOutputInterval() == 0) outputWriter.write(String.format(Locale.US, "%.8f\n%.8f %.8f\n", t, x, v));
 
             t += dt;
         }

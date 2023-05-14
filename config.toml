@@ -1,5 +1,5 @@
 [simulation]
-exercise = 2
+exercise = 1
 dtSimulation = 0.001
 outputInterval = 10
 verbose = false
